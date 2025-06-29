@@ -29,6 +29,7 @@ SRKverse-api/ <br>
 | |---services.py #Business logic and data handling <br>
 | |---data/ <br>
 | |----movies.json #Static movie data <br>
+| |----movies.json #Static movie data <br>
 | requirements.txt #Python dependencies <br>
 | README.md #You're here!
 

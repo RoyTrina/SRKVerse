@@ -13,7 +13,7 @@ def get_srk_bio():
             "birthplace": "New Delhi, India",
             "bio": ""}
 
-@shah_rukh_khan_router.get("/movies", response_model=list[Movie])
+@shah_rukh_khan_router.get("/srk/movies", response_model=list[Movie])
 def get_movies():
     return load_movies()
 
