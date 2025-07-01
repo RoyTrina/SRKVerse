@@ -1,11 +1,18 @@
 # SRKVerse/api/services.py
+import json
+import random
+from pathlib import Path
+
 import requests
 from django.conf import settings
-from .models import Movie, Quote
-from random import choice
+
+from .models import Movie, Quote, Award, Timeline
 
 API_KEY = settings.TMDB_API_KEY
 BASE_URL = "https://api.themoviedb.org/3"
+BASE_DIR = Path(__file__).resolve().parent
+DATA_DIR = BASE_DIR / "data"
+
 
 def search_srk_movies():
     """Fetch Shah Rukh Khan movies from TMDb and store in database."""
@@ -19,6 +26,7 @@ def search_srk_movies():
         for movie in movies:
             release_date = movie.get('release_date', '')
             release_year = int(release_date[:4]) if release_date else None
+            genres = movie.get('genre_ids', [])  # Note: Need additional TMDb API call to fetch genre names
             Movie.objects.update_or_create(
                 tmdb_id=movie['id'],
                 defaults={
@@ -26,7 +34,9 @@ def search_srk_movies():
                     'release_year': release_year,
                     'description': movie.get('overview', ''),
                     'role': movie.get('character', ''),
-                    'poster_path': movie.get('poster_path', '')
+                    'poster_path': movie.get('poster_path', ''),
+                    'rating': movie.get('vote_average', None),
+                    'genres': genres
                 }
             )
         return Movie.objects.all()
@@ -34,28 +44,149 @@ def search_srk_movies():
         print(f"Error fetching TMDb movies: {e}")
         return Movie.objects.all()
 
+
 def load_movies():
     """Load movies from TMDb."""
     return search_srk_movies()
 
+
 def get_random_quote():
     """Return a random quote from the database."""
     quotes = Quote.objects.all()
-    return choice(quotes) if quotes else None
+    return random.choice(quotes) if quotes else None
+
+
+def get_movies_by_year(year: int):
+    """Return movies from the database filtered by year."""
+    return Movie.objects.filter(release_year=year)
+
+
+def get_movie_by_title(title: str):
+    """Return a movie from the database filtered by title."""
+    return Movie.objects.filter(title__iexact=title).first()
+
+
+def get_top_rated():
+    """Return top 10 rated movies from the database in descending order by rating."""
+    return Movie.objects.filter(rating__isnull=False).order_by('-rating')[:10]
+
+
+def get_movies_by_genre(genre: str):
+    """Return movies from the database filtered by genre."""
+    return Movie.objects.filter(genres__icontains=genre.lower())
+
+
+def get_quotes_by_movie(title: str):
+    """Return quotes from the database filtered by movie title."""
+    movie = Movie.objects.filter(title__iexact=title).first()
+    return Quote.objects.filter(movie=movie) if movie else []
+
+
+def get_quotes_by_tag(tag: str):
+    """Return quotes from the database filtered by tag."""
+    return Quote.objects.filter(tags__icontains=tag.lower())
+
+
+def get_awards_by_year(year: int):
+    """Return awards from the database filtered by year."""
+    return Award.objects.filter(year=year)
+
+
+def get_awards_by_type(type: str):
+    """Return awards from the database filtered by type."""
+    return Award.objects.filter(award__icontains=type.lower())
+
+
+def get_events_by_year(year: int):
+    """Return timeline events from the database filtered by year."""
+    return Timeline.objects.filter(year=year)
+
+
+def get_debut():
+    """Get Shah Rukh Khan's debut event from the database."""
+    return Timeline.objects.filter(event__icontains="debut").first()
+
 
 def load_quotes():
-    """Load hardcoded quotes into the database."""
+    """Load quotes from quotes.json into the database."""
+    try:
+        with open(DATA_DIR / "quotes.json", "r", encoding="utf-8") as f:
+            quotes = json.load(f)
+            for quote in quotes:
+                movie = Movie.objects.filter(title=quote['movie']).first()
+                Quote.objects.update_or_create(
+                    text=quote['quote'],
+                    defaults={
+                        'movie': movie,
+                        'context': f"From {quote['movie']} ({quote['year']})",
+                        'tags': quote.get('tags', [])
+                    }
+                )
+    except FileNotFoundError:
+        print("quotes.json file not found.")
+
+        # Fall back if quotes.json is not found
     quotes = [
-        {"quote": "Don’t underestimate the power of a common man.", "movie": "Chennai Express", "year": 2013},
-        {"quote": "Kabhi kabhi jeetne ke liye kuch haarna padta hai.", "movie": "Baazigar", "year": 1993},
-        {"quote": "Picture abhi baaki hai mere dost.", "movie": "Om Shanti Om", "year": 2007}
-    ]
+        {"quote": "Don’t underestimate the power of a common man.", "movie": "Chennai Express", "year": 2013,
+         "tags": [], "context": "From Chennai Express (2013)"},
+        {"quote": "Kabhi kabhi jeetne ke liye kuch haarna padta hai.", "movie": "Baazigar", "year": 1993, "tags": [],
+         "context": "From Baazigar (1993)"},
+        {"quote": "Picture abhi baaki hai mere dost.", "movie": "Om Shanti Om", "year": 2007, "tags": [],
+         "context": "From Om Shanti Om (2007)"}]
+
     for quote in quotes:
         movie = Movie.objects.filter(title=quote['movie']).first()
         Quote.objects.update_or_create(
             text=quote['quote'],
             defaults={
                 'movie': movie,
-                'context': f"From {quote['movie']} ({quote['year']})"
+                'context': f"From {quote['movie']} ({quote['year']})",
+                'tags': quote['tags']
             }
         )
+
+
+def get_awards():
+    """Return all the awards in the database."""
+    return Award.objects.all()
+
+
+def load_awards():
+    """Load awards from awards.json into the database."""
+    try:
+        with open(DATA_DIR / "awards.json", "r", encoding="utf-8") as f:
+            awards = json.load(f)
+            for award in awards:
+                movie = Movie.objects.filter(title=award['movie']).first() if award.get('movie') else None
+                Award.objects.update_or_create(
+                    title=award['title'],
+                    year=award['year'],
+                    defaults={
+                        'award': award.get('type', ''),
+                        'description': award.get('description', ''),
+                        'movie': movie
+                    }
+                )
+    except FileNotFoundError:
+        print("awards.json file not found, skipping")
+
+
+def load_timeline():
+    """Load timeline from timeline.json into the database."""
+    try:
+        with open(DATA_DIR / "timeline.json", "r", encoding="utf-8") as f:
+            timeline = json.load(f)
+            for event in timeline:
+                Timeline.objects.update_or_create(
+                    year=event['year'],
+                    event=event['event'],
+                    defaults={
+                        'description': event.get('description', '')
+                    }
+                )
+    except FileNotFoundError:
+        print("timeline.json file not found, skipping")
+
+
+def get_timeline():
+    return Timeline.objects.all()
