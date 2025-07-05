@@ -21,7 +21,7 @@ def get_stdlib_modules():
 
 # Step 1: Extract all import statements from codebase
 def find_imports(directory):
-    imports = set()
+    packages = set()
     for [root, _, files] in os.walk(directory):
         for filename in files:
             if filename.endswith(".py"):
@@ -32,19 +32,19 @@ def find_imports(directory):
                         for node in ast.walk(tree):
                             if isinstance(node, ast.Import):
                                 for n in node.names:
-                                    imports.add(n.name.split('.')[0])
+                                    packages.add(n.name.split('.')[0])
                             elif isinstance(node, ast.ImportFrom):
                                 if node.module:
-                                    imports.add(node.module.split('.')[0])
+                                    packages.add(node.module.split('.')[0])
                 except SyntaxError:
                     print(f"⚠️ Skipping file with syntax error: {full_path}")
-    return imports
+    return packages
 
 # Step 2: Classify used imports into runtime and dev requirements
 def classify_packages(imports):
     stdlib = get_stdlib_modules()
     installed = {pkg.key: pkg.version for pkg in pkg_resources.working_set}
-    runtime = set()
+    run_time = set()
     dev = set()
 
     for imp in imports:
@@ -56,8 +56,8 @@ def classify_packages(imports):
             if any(dev_kw in name for dev_kw in DEV_KEYWORDS):
                 dev.add(versioned)
             else:
-                runtime.add(versioned)
-    return runtime, dev
+                run_time.add(versioned)
+    return run_time, dev
 
 # Step 3: Write a requirements.txt file
 def write_requirements(packages, filename):

@@ -1,4 +1,4 @@
-# SRKVerse/api/services.py
+# srkverse_api/api/services.py
 import json
 import random
 from pathlib import Path

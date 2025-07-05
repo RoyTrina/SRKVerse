@@ -1,5 +1,7 @@
 from django.core.management.base import BaseCommand
+
 from SRKVerse.api.services import load_movies, load_awards, load_timeline, load_quotes
+
 
 class Command(BaseCommand):
     help = 'Load Shah Rukh Khan movies, quotes, awards, and timeline into the database'

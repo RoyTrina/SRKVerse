@@ -1,9 +1,9 @@
 # srk_api.py
-from fastapi import FastAPI, HTTPException
-from typing import List, Optional
-import random
 import json
+import random
+
 import requests
+from fastapi import FastAPI, HTTPException
 
 app = FastAPI(title="Shah Rukh Khan API")
 
