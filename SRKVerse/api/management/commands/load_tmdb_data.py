@@ -7,8 +7,18 @@ class Command(BaseCommand):
     help = 'Load Shah Rukh Khan movies, quotes, awards, and timeline into the database'
 
     def handle(self, *args, **options):
-        movies = load_movies()
+        self.stdout.write('Loading movies from TMDB...')
+        load_movies()
+        self.stdout.write('Successfully loaded movies from TMDB.')
+
+        self.stdout.write('Loading timeline...')
         load_timeline()
+        self.stdout.write('Successfully loaded timeline.')
+
+        self.stdout.write('Loading awards...')
         load_awards()
+        self.stdout.write('Successfully loaded awards.')
+
+        self.stdout.write('Loading quotes...')
         load_quotes()
-        self.stdout.write(self.style.SUCCESS(f'Loaded {movies.count()} movies, quotes, awards, and timeline.'))
+        self.stdout.write('Successfully loaded quotes.')

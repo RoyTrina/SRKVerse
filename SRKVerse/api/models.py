@@ -4,11 +4,11 @@ from django.db import models
 class Movie(models.Model):
     objects = None
     tmdb_id = models.IntegerField(unique=True, null=True, blank=True)  # TMDb movie ID
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=255)
     release_year = models.IntegerField(null=True, blank=True)
     description = models.TextField(blank=True)
-    role = models.CharField(max_length=100, blank=True)
-    poster_path = models.CharField(max_length=200, blank=True)  # TMDb poster path
+    role = models.CharField(max_length=255, blank=True)
+    poster_path = models.CharField(max_length=255, blank=True)  # TMDb poster path
     rating = models.CharField(null=True, blank=True)
     genre = models.JSONField(default=list, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -71,3 +71,23 @@ class Timeline(models.Model):
 
 class FanVote(models.Model):
     objects = None
+    movie = models.ForeignKey('Movie', on_delete=models.CASCADE)
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    vote = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.movie.title} has {self.vote_count} votes"
+
+
+class FanMessage(models.Model):
+    objects = None
+    name = models.CharField(max_length=255)
+    email = models.EmailField()
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.name}: {self.message[:50]}..."

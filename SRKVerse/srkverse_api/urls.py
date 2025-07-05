@@ -20,7 +20,7 @@ from SRKVerse.api.views import (
     vote_favorite_view,
     get_quiz_view,
     validate_quiz_view,
-    submit_message_view,
+    submit_message_view
 )
 
 urlpatterns = [

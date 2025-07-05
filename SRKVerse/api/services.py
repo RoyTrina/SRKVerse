@@ -1,4 +1,3 @@
-# srkverse_api/api/services.py
 import json
 import random
 from pathlib import Path
@@ -6,7 +5,7 @@ from pathlib import Path
 import requests
 from django.conf import settings
 
-from .models import Movie, Quote, Award, Timeline
+from .models import Movie, Quote, Award, Timeline, FanVote
 
 API_KEY = settings.TMDB_API_KEY
 BASE_URL = "https://api.themoviedb.org/3"
@@ -23,10 +22,13 @@ def search_srk_movies():
         response = requests.get(url, params=params)
         response.raise_for_status()
         movies = response.json().get("cast", [])
+        genre_map = get_genre_names()
         for movie in movies:
             release_date = movie.get('release_date', '')
             release_year = int(release_date[:4]) if release_date else None
-            genres = movie.get('genre_ids', [])  # Note: Need additional TMDb API call to fetch genre names
+            genre_ids = movie.get('genre_ids', [])
+            genres = [genre_map.get(gid, str(gid)) for gid in
+                      genre_ids]  # Note: Need additional TMDb API call to fetch genre names
             Movie.objects.update_or_create(
                 tmdb_id=movie['id'],
                 defaults={
@@ -45,9 +47,61 @@ def search_srk_movies():
         return Movie.objects.all()
 
 
+def get_genre_names():
+    """Fetch genre names from TMDb and store in a dictionary."""
+    url = f"{BASE_URL}/genre/movie/list"
+    params = {"api_key": API_KEY, "language": "en-US"}
+    try:
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        return {genre['id']: genre['name'] for genre in response.json()['genres']}
+    except requests.RequestException as e:
+        print(f"Error fetching TMDb genre names: {e}")
+        return {}
+
+
 def load_movies():
     """Load movies from TMDb."""
     return search_srk_movies()
+
+
+def load_quotes():
+    """Load quotes from quotes.json into the database."""
+    try:
+        with open(DATA_DIR / "quotes.json", "r", encoding="utf-8") as f:
+            quotes = json.load(f)
+            for quote in quotes:
+                movie = Movie.objects.filter(title=quote['movie']).first()
+                Quote.objects.update_or_create(
+                    text=quote['quote'],
+                    defaults={
+                        'movie': movie,
+                        'context': f"From {quote['movie']} ({quote['year']})",
+                        'tags': quote.get('tags', [])
+                    }
+                )
+    except FileNotFoundError:
+        print("quotes.json file not found.")
+
+        # Fall back if quotes.json is not found
+    quotes = [
+        {"quote": "Don’t underestimate the power of a common man.", "movie": "Chennai Express", "year": 2013,
+         "tags": [], "context": "From Chennai Express (2013)"},
+        {"quote": "Kabhi kabhi jeetne ke liye kuch haarna padta hai.", "movie": "Baazigar", "year": 1993, "tags": [],
+         "context": "From Baazigar (1993)"},
+        {"quote": "Picture abhi baaki hai mere dost.", "movie": "Om Shanti Om", "year": 2007, "tags": [],
+         "context": "From Om Shanti Om (2007)"}]
+
+    for quote in quotes:
+        movie = Movie.objects.filter(title=quote['movie']).first()
+        Quote.objects.update_or_create(
+            text=quote['quote'],
+            defaults={
+                'movie': movie,
+                'context': f"From {quote['movie']} ({quote['year']})",
+                'tags': quote['tags']
+            }
+        )
 
 
 def get_random_quote():
@@ -107,45 +161,6 @@ def get_debut():
     return Timeline.objects.filter(event__icontains="debut").first()
 
 
-def load_quotes():
-    """Load quotes from quotes.json into the database."""
-    try:
-        with open(DATA_DIR / "quotes.json", "r", encoding="utf-8") as f:
-            quotes = json.load(f)
-            for quote in quotes:
-                movie = Movie.objects.filter(title=quote['movie']).first()
-                Quote.objects.update_or_create(
-                    text=quote['quote'],
-                    defaults={
-                        'movie': movie,
-                        'context': f"From {quote['movie']} ({quote['year']})",
-                        'tags': quote.get('tags', [])
-                    }
-                )
-    except FileNotFoundError:
-        print("quotes.json file not found.")
-
-        # Fall back if quotes.json is not found
-    quotes = [
-        {"quote": "Don’t underestimate the power of a common man.", "movie": "Chennai Express", "year": 2013,
-         "tags": [], "context": "From Chennai Express (2013)"},
-        {"quote": "Kabhi kabhi jeetne ke liye kuch haarna padta hai.", "movie": "Baazigar", "year": 1993, "tags": [],
-         "context": "From Baazigar (1993)"},
-        {"quote": "Picture abhi baaki hai mere dost.", "movie": "Om Shanti Om", "year": 2007, "tags": [],
-         "context": "From Om Shanti Om (2007)"}]
-
-    for quote in quotes:
-        movie = Movie.objects.filter(title=quote['movie']).first()
-        Quote.objects.update_or_create(
-            text=quote['quote'],
-            defaults={
-                'movie': movie,
-                'context': f"From {quote['movie']} ({quote['year']})",
-                'tags': quote['tags']
-            }
-        )
-
-
 def get_awards():
     """Return all the awards in the database."""
     return Award.objects.all()
@@ -186,7 +201,67 @@ def load_timeline():
                 )
     except FileNotFoundError:
         print("timeline.json file not found, skipping")
+        timeline = [{"year": 1992, "event": "Debut in Deewana", "description": "Shah Rukh Khan's first film role"},
+                    {"year": 2000, "event": "Founded Red Chillies Entertainment",
+                     "description": "Production company launch"},
+                    {"year": 2011, "event": "Ra.One Release", "description": "Sci-fi film release"}]
+        for event in timeline:
+            Timeline.objects.update_or_create(
+                year=event['year'],
+                event=event['event'],
+                defaults={
+                    'description': event.get('description', '')
+                }
+            )
 
 
 def get_timeline():
     return Timeline.objects.all()
+
+
+def vote_favorite(title: str):
+    """Record a vote for a favorite movie."""
+    movie = Movie.objects.filter(title__iexact=title).first()
+    if not movie:
+        return None
+    vote, created = FanVote.objects.get_or_create(movie=movie,
+                                                  defaults={'vote_count': 0})
+    if not created:
+        vote.votes += 1
+        vote.save()
+    return vote
+
+
+def get_votes():
+    """Return all votes for favorite movies."""
+    return FanVote.objects.all()
+
+
+def get_quiz():
+    """Return a random quiz question (example implementation)."""
+    quotes = Quote.objects.all()
+    if not quotes:
+        return {"question": "No quotes available", "options": [], "answer": ""}
+    quote = random.choice(quotes)
+    movies = Movie.objects.all()[:3]
+    options = [movie.title for movie in movies]
+    if quote.movie and quote.movie.title not in options:
+        options.append(quote.movie.title)
+    random.shuffle(options)
+    return {
+        "question": f"Which movie is this quote from: '{quote.text}'?",
+        "options": options,
+        "answer": quote.movie.title if quote.movie else ""
+    }
+
+
+def validate_quiz(title: str, answer: str):
+    """Validate a quiz answer."""
+    movie = Movie.objects.filter(title__iexact=title).first()
+    if not movie:
+        return {"correct": False, "message": "Movie not found"}
+    quotes = Quote.objects.filter(movie=movie)
+    if not quotes:
+        return {"correct": False, "message": "No quotes for this movie"}
+    correct = any(quote.text == answer for quote in quotes)
+    return {"correct": correct, "message": "Correct!" if correct else "Incorrect."}

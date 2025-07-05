@@ -3,11 +3,12 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .models import Quote
-from .serializers import MovieSerializer, QuoteSerializer, AwardSerializer, TimelineSerializer
+from .serializers import MovieSerializer, QuoteSerializer, AwardSerializer, TimelineSerializer, FanVoteSerializer, FanMessageSerializer
 from .services import (load_movies, get_random_quote, get_movie_by_title,
                        get_movies_by_year, get_debut,
                        get_top_rated, get_movies_by_genre, get_quotes_by_movie, get_quotes_by_tag, get_awards,
-                       get_awards_by_year, get_awards_by_type, get_events_by_year, get_timeline)
+                       get_awards_by_year, get_awards_by_type, get_events_by_year, get_timeline, get_votes,
+                       vote_favorite, get_quiz, validate_quiz, submit_message)
 
 
 @api_view(['GET'])
@@ -122,12 +123,13 @@ def get_debut_view():
 
 
 # Fan interaction stubs (to be implemented with proper models if needed)
-fake_votes = {}
 
 
 @api_view(['GET'])
 def get_votes_view():
-    return Response(fake_votes)
+    votes = get_votes()
+    serializer = FanVoteSerializer(votes, many=True)
+    return Response(serializer.data)
 
 
 @api_view(['POST'])
@@ -135,32 +137,33 @@ def vote_favorite_view(request):
     title = request.data.get('title')
     if not title:
         return Response({"error": "Title is required"}, status=status.HTTP_400_BAD_REQUEST)
-    fake_votes[title] = fake_votes.get(title, 0) + 1
-    return Response({"message": "Vote recorded", "votes": fake_votes[title]})
+    vote = vote_favorite(title)
+    if vote:
+        serializer = FanVoteSerializer(vote)
+        return Response(serializer.data)
+    return Response({"error": "Movie not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
 def get_quiz_view():
-    return Response({
-        "question": "What was Shah Rukh Khan's debut film?",
-        "options": ["Deewana", "Baazigar", "Kabhi Haan Kabhi Naa"],
-        "answer": "Deewana"
-    })
+    quiz = get_quiz()
+    return Response(quiz)
 
 
 @api_view(['POST'])
 def validate_quiz_view(request):
+    title = request.data.get('title')
     answer = request.data.get('answer')
-    if not answer:
-        return Response({"error": "Answer is required"}, status=status.HTTP_400_BAD_REQUEST)
-    correct = "Deewana"
-    return Response({"correct": answer.strip().lower() == correct.lower()})
+    if not (title and answer):
+        return Response({"error": "Title and answer are required"}, status=status.HTTP_400_BAD_REQUEST)
+    result = validate_quiz(title, answer)
+    return Response(result)
 
 
 @api_view(['POST'])
 def submit_message_view(request):
-    name = request.data.get('name')
-    message = request.data.get('message')
-    if not name or not message:
-        return Response({"error": "Name and message are required"}, status=status.HTTP_400_BAD_REQUEST)
-    return Response({"message": f"Thank you {name} for your message!"})
+    serializer = FanMessageSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({"message": f"Thank you {serializer.data['name']} for your message!"})
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
