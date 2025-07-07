@@ -1,78 +1,95 @@
-# 👋 Hi, I'm Trina Roy
+# 🎬 SRKverse – A Shah Rukh Khan Information API
 
-I'm a Computing graduate from the University of Essex with hands-on experience in software development, cybersecurity, and data analysis. I'm currently **open to work** — seeking full-time or part-time opportunities where I can apply and grow my skills in a dynamic, tech-driven environment.
+Welcome to the **SRKverse API** –
+a RESTful API built with **FastAPI** that celebrates the legacy of Bollywood icon **Shah Rukh Khan**.
 
----
-
-## 🌟 About Me
-
-- 💼 Actively looking for **developer, analyst, or cybersecurity-related roles**
-- 🎓 BSc in Computing, University of Essex (2023)
-- 💡 Experience with Python, Java, JavaScript, HTML, CSS, PHP, MySQL, and more
-- 🌐 Multilingual communicator with strong interpersonal and team skills
-- 🧠 Passionate about continuous learning and solving real-world problems with tech
+This project provides structured access to Shah Rukh Khan's biography, films, famous quotes, and more.
+Great for fan apps, trivia games, film databases, and Bollywood data mashups.
 
 ---
 
-## 🛠️ Tech Stack & Tools
+## 🚀 Features
 
-![Python](https://img.shields.io/badge/-Python-333?logo=python&logoColor=white&style=flat-square)
-![Java](https://img.shields.io/badge/-Java-333?logo=java&logoColor=white&style=flat-square)
-![JavaScript](https://img.shields.io/badge/-JavaScript-333?logo=javascript&logoColor=yellow&style=flat-square)
-![HTML5](https://img.shields.io/badge/-HTML5-333?logo=html5&style=flat-square)
-![CSS3](https://img.shields.io/badge/-CSS3-333?logo=css3&style=flat-square)
-![PHP](https://img.shields.io/badge/-PHP-333?logo=php&style=flat-square)
-![MySQL](https://img.shields.io/badge/-MySQL-333?logo=mysql&style=flat-square)
-![Git](https://img.shields.io/badge/-Git-333?logo=git&style=flat-square)
-![Jira](https://img.shields.io/badge/-Jira-333?logo=jira&style=flat-square)
-![MATLAB](https://img.shields.io/badge/-MATLAB-333?logo=mathworks&style=flat-square)
+- 📜 **Biography** – Learn about SRK's journey and legacy
+- 🎞️ **Movies** – Browse key films with metadata
+- 🗣️ **Quotes** – Iconic quotes from memorable films
+- 🎯 **Random Quote** – Get a surprise SRK dialogue
+- 🏆 *(Planned)*: Awards, timeline, trivia, polls, and more!
 
 ---
 
-## 🧩 Projects
+## 📁 Project Structure
 
-- 🔥 [Web Development Assignments](https://github.com/RoyTrina/CE212---Web-Development-GitHub-copy-):  
-  HTML, CSS, JavaScript projects including a **temperature converter**, **marking form**, and **word counter**
+SRKverse-api/ <br>
+|---app/ <br>
+| |---init.py <br>
+| |---main.py #Entry point <br>
+| |---routes.py #All API endpoints <br>
+| |---models.py #Pydantic models for validation <br>
+| |---services.py #Business logic and data handling <br>
+| |---data/ <br>
+| |----movies.json #Static movie data <br>
+| |----movies.json #Static movie data <br>
+| requirements.txt #Python dependencies <br>
+| README.md #You're here!
 
-- 🎮 [Poke Dex Tutorial](https://gitlab.com/code2585017/pokedexbytrinaroy-tutorialbyjustinkim):  
-  A modified Pokédex built using tutorial-based guidance
+## ⚙️ Installation
 
-- 🎵 [Music Player](https://gitlab.com/RoyTrina/music_player_by_travesty_media):  
-  A clean and simple music player interface project
+1. **Clone the repo**:
+    ```bash git clone https://gitlab.com/RoyTrina/srkverse-api.git 
+    cd srkverse-api```
 
-- 🔐 [Three Random Words](https://gitlab.com/code2585017/year-3-in-computer-science/Three_Random_Words):  
-  Cybersecurity-related project inspired by UK’s NCSC guidelines
+2. Set up a virtual environment (optional but recommended):
+   ```
+   python -m venv venv
+   source venv/bin/activate
+   ```
+   On Windows the second line becomes: ```venv\Scripts\activate```
+   <br>
+   <br>
+3. Install dependencies
+   ```pip install -r requirements.txt```
+   <br>
+   <br>
+4. Run the server:
+   ```uvicorn app.main:app --reload```
 
-- 🌐 [My Website](https://gitlab.com/RoyTrina/my-website):  
-  Personal website built to showcase projects and skills
+## 📡 API Endpoints
 
----
+| Method | Endpoint            | Description                |
+|--------|---------------------|----------------------------|
+| GET    | `/srk/bio`          | Returns SRK's biography    |
+| GET    | `/srk/movies`       | List of popular SRK movies |
+| GET    | `/srk/random-quote` | Get a random SRK quote     |
 
-## 📜 Certifications
+## 📊 Sample JSON Data (/srk/movies)
 
-- Introduction to Data Analysis  
-- Data Science and Machine Learning with R  
-- SQL Programming Masterclass  
-- GDPR Data Protection Level 5  
-- Data Analytics with Tableau  
-- Cybersecurity Foundations & Awareness  
-- Microsoft Copilot for Security  
-…and more!
+{ <br>
+"title": "My Name Is Khan", <br>
+"year": 2010, <br>
+"director": "Karan Johar", <br>
+"genres": ["Drama", "Romance"], <br>
+"plot": "An Indian Muslim with Asperger’s syndrome embarks on a journey to meet the U.S. President."
+<br>
+}
 
----
+## 🛠️ Built With
 
-## 📫 How to Reach Me
+1. [FastAPI](https://fastapi.tiangolo.com/) – Modern Python web framework
 
-- 📧 Email: [roy.trina2013@gmail.com](mailto:roy.trina2013@gmail.com)  
-- 💼 LinkedIn: [linkedin.com/in/trinaroy](https://www.linkedin.com/in/trinaroy/)  
-- 📱 Phone: 07923118026
+2. [Uvicorn](https://www.uvicorn.org/) – ASGI server
 
----
+3. [Pydantic](https://docs.pydantic.dev/) – Data parsing and validation
 
-## ⚡ Fun Fact
+## 📌 License
 
-When I’m not coding, I love exploring languages, helping others learn, and volunteering in my community.
+This project is licensed under the [MIT Licence](LICENSE).
+This is a fan-made, educational project is **not affiliated with Shah Rukh Khan** or any official entity.
 
----
+## 🙏 Acknowledgments
 
-⭐️ *Thanks for visiting my profile! If you're hiring or know of opportunities that align with my skills, feel free to reach out — I’d love to connect!*
+This is my version of a love letter to Shah Rukh Khan, one of the greatest movie stars of all time 🌟
+
+Data and ideas partially derived from [The Movie Database (TMDb)](https://www.themoviedb.org/)
+
+## 👑 Made with ❤️ for the King of Bollywood from a fan
