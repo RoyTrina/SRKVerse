@@ -19,7 +19,7 @@ def get_stdlib_modules():
             'typing', 'subprocess', 'logging', 'threading', 'http', 'urllib', 'email', 'itertools',
         }
 
-# Step 1: Extract all import statements from codebase
+# Step 1: remove all import statements from the codebase
 def find_imports(directory):
     packages = set()
     for [root, _, files] in os.walk(directory):
@@ -41,10 +41,12 @@ def find_imports(directory):
     return packages
 
 # Step 2: Classify used imports into runtime and dev requirements
+# noinspection PyShadowingNames
 def classify_packages(imports):
     stdlib = get_stdlib_modules()
     installed = {pkg.key: pkg.version for pkg in pkg_resources.working_set}
     run_time = set()
+    # noinspection PyShadowingNames
     dev = set()
 
     for imp in imports:

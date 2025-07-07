@@ -28,7 +28,7 @@ def search_srk_movies():
             release_year = int(release_date[:4]) if release_date else None
             genre_ids = movie.get('genre_ids', [])
             genres = [genre_map.get(gid, str(gid)) for gid in
-                      genre_ids]  # Note: Need additional TMDb API call to fetch genre names
+                      genre_ids]  # Note: Need more TMDb API call to fetch genre names
             Movie.objects.update_or_create(
                 tmdb_id=movie['id'],
                 defaults={
@@ -111,7 +111,7 @@ def get_random_quote():
 
 
 def get_movies_by_year(year: int):
-    """Return movies from the database filtered by year."""
+    """Return movies from the database filtered by the year."""
     return Movie.objects.filter(release_year=year)
 
 
@@ -126,7 +126,7 @@ def get_top_rated():
 
 
 def get_movies_by_genre(genre: str):
-    """Return movies from the database filtered by genre."""
+    """Return movies from the database filtered by the genre."""
     return Movie.objects.filter(genres__icontains=genre.lower())
 
 
@@ -142,7 +142,7 @@ def get_quotes_by_tag(tag: str):
 
 
 def get_awards_by_year(year: int):
-    """Return awards from the database filtered by year."""
+    """Return awards from the database filtered by the year."""
     return Award.objects.filter(year=year)
 
 
@@ -152,7 +152,7 @@ def get_awards_by_type(type: str):
 
 
 def get_events_by_year(year: int):
-    """Return timeline events from the database filtered by year."""
+    """Return timeline events from the database filtered by the year."""
     return Timeline.objects.filter(year=year)
 
 
@@ -187,7 +187,7 @@ def load_awards():
 
 
 def load_timeline():
-    """Load timeline from timeline.json into the database."""
+    """Load timeline from the timeline.json into the database."""
     try:
         with open(DATA_DIR / "timeline.json", "r", encoding="utf-8") as f:
             timeline = json.load(f)
@@ -265,3 +265,7 @@ def validate_quiz(title: str, answer: str):
         return {"correct": False, "message": "No quotes for this movie"}
     correct = any(quote.text == answer for quote in quotes)
     return {"correct": correct, "message": "Correct!" if correct else "Incorrect."}
+
+
+def submit_message():
+    return None

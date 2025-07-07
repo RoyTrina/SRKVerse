@@ -1,3 +1,4 @@
+# noinspection GrazieInspection
 """
 Django settings for srkverse_api project.
 

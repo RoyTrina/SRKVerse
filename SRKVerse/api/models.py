@@ -31,6 +31,7 @@ class Quote(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
+        # noinspection PyTypeChecker
         return self.text[:50] + '...' if len(self.text) > 50 else self.text
 
     class Meta:
@@ -76,6 +77,10 @@ class FanVote(models.Model):
     vote = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(args, kwargs)
+        self.vote_count = None
 
     def __str__(self):
         return f"{self.movie.title} has {self.vote_count} votes"

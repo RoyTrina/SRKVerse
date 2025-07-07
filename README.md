@@ -20,17 +20,31 @@ Great for fan apps, trivia games, film databases, and Bollywood data mashups.
 
 ## 📁 Project Structure
 
-SRKverse-api/ <br>
-|---app/ <br>
-| |---init.py <br>
-| |---main.py #Entry point <br>
-| |---routes.py #All API endpoints <br>
-| |---models.py #Pydantic models for validation <br>
-| |---services.py #Business logic and data handling <br>
-| |---data/ <br>
-| |----movies.json #Static movie data <br>
-| |----movies.json #Static movie data <br>
-| requirements.txt #Python dependencies <br>
+srkverse-a-shah-rukh-khan-information-api/ <br>
+├── manage.py  <br>
+├── srkverse_api/ <br>
+│   ├── __init__.py <br>
+│   ├── settings.py <br>
+│   ├── urls.py <br>
+│   ├── wsgi.py <br>
+│   └── asgi.py <br>
+├── SRKVerse/ <br>
+│   ├── api/ <br>
+│   │   ├── __init__.py <br>
+│   │   ├── admin.py <br>
+│   │   ├── apps.py <br>
+│   │   ├── models.py <br>
+│   │   ├── serializers.py <br>
+│   │   ├── services.py <br>
+│   │   ├── urls.py <br>
+│   │   ├── views.py <br>
+│   │   └── management/ <br>
+│   │       ├── __init__.py <br>
+│   │       └── commands/ <br>
+│   │           ├── __init__.py <br>
+│   │           └── load_tmdb_data.py <br>
+├── media/ <br>
+└── .env <br>
 | README.md #You're here!
 
 ## ⚙️ Installation

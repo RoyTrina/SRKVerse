@@ -73,7 +73,8 @@ class AwardAdmin(admin.ModelAdmin):
         }),
     )
 
-    def movie_preview(self, obj):
+    @staticmethod
+    def movie_preview(obj):
         return obj.movie.title if obj.movie else None
 
 
@@ -91,7 +92,8 @@ class TimelineAdmin(admin.ModelAdmin):
         })
     )
 
-    def movie_preview(self, obj):
+    @staticmethod
+    def movie_preview(obj):
         return obj.movie.title if obj.movie else None
 
 @admin.register(FanVote)
@@ -106,7 +108,8 @@ class FanVoteAdmin(admin.ModelAdmin):
         (None, {
             'fields': ('title', 'votes')})
     )
-    def movie_preview(self, obj):
+    @staticmethod
+    def movie_preview(obj):
         return obj.movie.title if obj.movie else None
 
 
