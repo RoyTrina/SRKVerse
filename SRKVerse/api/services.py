@@ -1,16 +1,28 @@
-import json
 import random
 from pathlib import Path
 
 import requests
 from django.conf import settings
 
-from .models import Movie, Quote, Award, Timeline, FanVote
+from .models import Movie, Quote, Award, Timeline, FanVote, Song
+from .data.sample_data import SAMPLE_AWARDS, SAMPLE_QUOTES, SAMPLE_SONGS, SAMPLE_TIMELINE
 
 API_KEY = settings.TMDB_API_KEY
 BASE_URL = "https://api.themoviedb.org/3"
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
+
+
+def load_movies():
+    """Load Shah Rukh KHan's movies from TMDb into the database.
+    """
+    srk_id = 33488
+    url = f"https://api.themoviedb.org/3/person/{srk_id}/movie_credits"
+    params = {"api_key": settings.TMDB_API_KEY, "language": "en-US"}
+    try:
+        response = 
+
+
 
 
 def search_srk_movies():
@@ -60,7 +72,7 @@ def get_genre_names():
         return {}
 
 
-def load_movies():
+
     """Load movies from TMDb."""
     return search_srk_movies()
 

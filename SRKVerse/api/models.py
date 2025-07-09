@@ -96,3 +96,15 @@ class FanMessage(models.Model):
 
     def __str__(self):
         return f"{self.name}: {self.message[:50]}..."
+
+
+class Song(models.Model):
+    title = models.CharField(max_length=255)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='songs')
+    audio_file = models.FileField(upload_to='songs/', null=True, blank=True)
+    composer = models.CharField(max_length=100, blank=True)
+    lyricist = models.CharField(max_length=100, blank=True)
+    duration = models.CharField(max_length=10, blank=True)
+
+    def __str__(self):
+        return f"{self.title} ({self.movie.title})"

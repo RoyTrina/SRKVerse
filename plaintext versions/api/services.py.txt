@@ -1,0 +1,204 @@
+import requests
+from django.conf import settings
+from .models import Movie, Quote, Award, Timeline, FanVote, Song
+from django.db.models import Count
+import random
+from .data.sample_data import SAMPLE_QUOTES, SAMPLE_AWARDS, SAMPLE_TIMELINE, SAMPLE_SONGS
+
+def load_movies():
+    """Load Shah Rukh Khan's movies from TMDb into the database."""
+    srk_id = 33488
+    url = f"https://api.themoviedb.org/3/person/{srk_id}/movie_credits"
+    params = {"api_key": settings.TMDB_API_KEY, "language": "en-US"}
+    try:
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        movies = response.json().get("cast", [])
+        genre_url = "https://api.themoviedb.org/3/genre/movie/list"
+        genre_response = requests.get(genre_url, params=params)
+        genre_response.raise_for_status()
+        genre_map = {genre['id']: genre['name'] for genre in genre_response.json().get('genres', [])}
+        
+        for movie in movies:
+            Movie.objects.update_or_create(
+                tmdb_id=movie.get("id"),
+                defaults={
+                    'title': movie.get("title", ""),
+                    'release_year': movie.get("release_date", "")[:4] or None,
+                    'overview': movie.get("overview", ""),
+                    'poster_path': movie.get("poster_path", ""),
+                    'rating': movie.get("vote_average", 0.0),
+                    'genres': [genre_map.get(gid, str(gid)) for gid in movie.get("genre_ids", [])],
+                    'character': movie.get("character", "")
+                }
+            )
+    except requests.RequestException as e:
+        print(f"Error loading movies: {e}")
+
+def load_quotes():
+    """Load quotes into the database from sample data."""
+    for q in SAMPLE_QUOTES:
+        movie = Movie.objects.filter(title=q["movie"]).first()
+        Quote.objects.update_or_create(
+            text=q["quote"],
+            defaults={
+                'movie': movie,
+                'year': q["year"],
+                'tags': q["tags"],
+                'context': q["context"]
+            }
+        )
+
+def load_awards():
+    """Load awards into the database from sample data."""
+    for a in SAMPLE_AWARDS:
+        movie = Movie.objects.filter(title=a["movie"]).first()
+        Award.objects.update_or_create(
+            title=a["title"],
+            year=a["year"],
+            defaults={
+                'type': a["type"],
+                'movie': movie,
+                'description': a["description"]
+            }
+        )
+
+def load_timeline():
+    """Load timeline events into the database from sample data."""
+    for t in SAMPLE_TIMELINE:
+        Timeline.objects.update_or_create(
+            year=t["year"],
+            event=t["event"],
+            defaults={'description': t["description"]}
+        )
+
+def load_songs():
+    """Load songs into the database from sample data and attempt TMDb metadata."""
+    for s in SAMPLE_SONGS:
+        movie = Movie.objects.filter(title=s["movie"]).first()
+        if movie:
+            Song.objects.update_or_create(
+                title=s["title"],
+                movie=movie,
+                defaults={
+                    'composer': s.get("composer", ""),
+                    'lyricist': s.get("lyricist", ""),
+                    'duration': s.get("duration", "")
+                }
+            )
+    # Attempt to fetch additional song metadata from TMDb movie details
+    movies = Movie.objects.all()
+    for movie in movies:
+        if movie.tmdb_id:
+            url = f"https://api.themoviedb.org/3/movie/{movie.tmdb_id}/credits"
+            params = {"api_key": settings.TMDB_API_KEY, "language": "en-US"}
+            try:
+                response = requests.get(url, params=params)
+                response.raise_for_status()
+                credits = response.json().get("crew", [])
+                composer = next((c["name"] for c in credits if c["job"] == "Original Music Composer"), None)
+                if composer:
+                    # Update existing songs with composer if not set
+                    songs = Song.objects.filter(movie=movie, composer="")
+                    for song in songs:
+                        song.composer = composer
+                        song.save()
+            except requests.RequestException as e:
+                print(f"Error fetching TMDb credits for {movie.title}: {e}")
+
+def get_songs():
+    """Get all songs."""
+    return Song.objects.all()
+
+def get_songs_by_movie(title):
+    """Get songs by movie title."""
+    movie = Movie.objects.filter(title__iexact=title).first()
+    return Song.objects.filter(movie=movie) if movie else []
+
+def get_random_quote():
+    """Get a random quote from the database."""
+    quotes = Quote.objects.all()
+    return random.choice(quotes) if quotes else None
+
+def get_movies_by_year(year):
+    """Get movies by release year."""
+    return Movie.objects.filter(release_year=year)
+
+def get_movie_by_title(title):
+    """Get a movie by its title."""
+    return Movie.objects.filter(title__iexact=title).first()
+
+def get_top_rated_movies():
+    """Get top-rated movies."""
+    return Movie.objects.order_by('-rating')[:10]
+
+def get_movies_by_genre(genre):
+    """Get movies by genre."""
+    return Movie.objects.filter(genres__contains=[genre])
+
+def get_quotes_by_movie(title):
+    """Get quotes by movie title."""
+    movie = Movie.objects.filter(title__iexact=title).first()
+    return Quote.objects.filter(movie=movie) if movie else []
+
+def get_quotes_by_tag(tag):
+    """Get quotes by tag."""
+    return Quote.objects.filter(tags__contains=[tag])
+
+def get_awards():
+    """Get all awards."""
+    return Award.objects.all()
+
+def get_awards_by_year(year):
+    """Get awards by year."""
+    return Award.objects.filter(year=year)
+
+def get_awards_by_type(award_type):
+    """Get awards by type."""
+    return Award.objects.filter(type__iexact=award_type)
+
+def get_timeline():
+    """Get all timeline events."""
+    return Timeline.objects.all()
+
+def get_events_by_year(year):
+    """Get timeline events by year."""
+    return Timeline.objects.filter(year=year)
+
+def get_debut():
+    """Get Shah Rukh Khan's debut event."""
+    return Timeline.objects.filter(event__icontains="debut").first()
+
+def get_votes():
+    """Get all fan votes."""
+    return FanVote.objects.all()
+
+def vote_favorite(title):
+    """Record a vote for a favorite movie."""
+    movie = Movie.objects.filter(title__iexact=title).first()
+    if movie:
+        vote, created = FanVote.objects.get_or_create(movie=movie)
+        vote.vote_count += 1
+        vote.save()
+        return vote
+    return None
+
+def get_quiz():
+    """Generate a quiz question."""
+    movies = Movie.objects.all()
+    if not movies:
+        return {"error": "No movies available"}
+    movie = random.choice(movies)
+    return {
+        "question": f"Who played the lead role in {movie.title}?",
+        "options": ["Shah Rukh Khan", "Aamir Khan", "Salman Khan", "Hrithik Roshan"],
+        "correct_answer": "Shah Rukh Khan",
+        "movie": movie.title
+    }
+
+def validate_quiz(title, answer):
+    """Validate a quiz answer."""
+    movie = Movie.objects.filter(title__iexact=title).first()
+    if not movie:
+        return {"error": "Movie not found"}
+    return {"correct": answer == "Shah Rukh Khan"}
