@@ -2,25 +2,29 @@
 
 Welcome to the **SRKVerse API** – a 🌟 RESTful API built with **Django REST Framework** that celebrates the legacy of Bollywood icon **Shah Rukh Khan**! 
 
-This project provides structured access to SRK’s films, songs, quotes, awards, timeline, and fan interactions. 
-Perfect for fan apps, trivia games, film databases, and Bollywood data mashups! 🎥
+This project provides structured access to SRK's films, songs, quotes, awards, timeline, and fan interactions. 
+Perfect for fan apps, trivia games, film databases, and Bollywood data mashups!
+🎥.
 
 ---
 
 ## 🚀 Features
-🎞️ **Movies**: Browse SRK’s films with metadata from TMDb (`/api/srk/movies/tmdb/`) or the database (`/api/srk/movies/`), filter by year, genre, or title, and get top-rated films. <br>
+🎞️ **Movies**: Browse SRK's films with metadata from TMDb (`/api/srk/movies/tmdb/`) or the database (`/api/srk/movies/`), filter by the year, genre, or title, and get top-rated films.
+<br>.
 
-🎵 **Songs**: Access iconic movie soundtracks with metadata (e.g., composer, lyricist) and admin-uploaded audio files (`/api/srk/songs/`, `/api/srk/movies/<title>/songs/`). <br>
+🎵 **Songs**: Access iconic movie soundtracks with metadata (e.g. composer, lyricist) and admin-uploaded audio files (`/api/srk/songs/`, `/api/srk/movies/<title>/songs/`).
+<br>.
 
-🗣️ **Quotes**: Retrieve SRK’s memorable dialogues, filter by movie or tag, or get a random quote (`/api/srk/quotes/`, `/api/srk/quotes/random/`). <br>
+🗣️ **Quotes**: Retrieve SRK’s memorable dialogues, filter by the movie or tag, or get a random quote (`/api/srk/quotes/`, `/api/srk/quotes/random/`).
+<br>.
 
-🏆 **Awards**: Explore SRK’s accolades, filter by year or type (`/api/srk/awards/`). <br>
+🏆 **Awards**: Explore SRK’s accolades, filter by the year or type (`/api/srk/awards/`). <br>
 
 📅 **Timeline**: View key milestones in SRK’s career (`/api/srk/timeline/`). <br>
 
 ❤️ **Fan Interactions**: Submit fan messages (`/api/srk/fan-message/`), vote for favorite movies (`/api/srk/vote/`), and take SRK quizzes (`/api/srk/quiz/`). <br>
 
-🛠️ **Admin Interface**: Manage data (e.g., upload song audio files) at http://localhost:8000/admin/. <br>
+🛠️ **Admin Interface**: Manage data (for example, upload song audio files) at http://localhost:8000/admin/. <br>
 
 🌍 **Planned**: Spotify/YouTube API integration for enhanced song data, frontend templates for song playback.<br>
 
@@ -110,31 +114,31 @@ Populate the database with TMDb movies and sample data: <br>
 
 ## 📡 API Endpoints
 
-| Method | Endpoint                        | Description                                 |
-|--------|---------------------------------|---------------------------------------------|
-| GET    |`/api/srk/movies/tmdb/`          | 🎬 Raw Shah Rukh Khan movie data from TMDb  |
-| GET    |`/api/srk/movies/`               | 🎬 List all SRK movies in database          |
-| GET    |`/api/srk/movies/year/<year>/`   | 🎬 Movies by release year                   |
-| GET    |`/api/srk/movies/title/<title>/` | 🎬 Movie by title                           |
-| GET    |`/api/srk/movies/top-rated/`     | 🎬 Top-rated SRK movies                     |
-| GET    |`/api/srk/movies/genre/<genre>/` | 🎬 Movies by genre                          |
-| GET    |`/api/srk/songs/`                | 🎵 List all SRK movie songs                 |
-| GET    |`/api/srk/movies/<title>/songs/` | 🎵 Songs for a specific movie               |
-| GET    |`/api/srk/quotes/`               | 💬 List all SRK quotes                      |
-| GET    |`/api/srk/quotes/random/`        | 💬 Random SRK quote                         |
-| GET    |`/api/srk/quotes/movie/<title>/` | 💬 Quotes by movie title                    |
-| GET    |`/api/srk/quotes/tag/<tag>/`     | 💬 Quotes by tag (e.g., inspirational)      |
-| GET    |`/api/srk/awards/`               | 🏆 List all SRK awards                      |
-| GET    |`/api/srk/awards/year/<year>/`   | 🏆 Awards by year                           |
-| GET    |`/api/srk/awards/type/<type>/`   | 🏆 Awards by type (e.g., Filmfare)          |
-| GET    |`/api/srk/timeline/`             | 📅 SRK career milestones                    |
-| GET    |`/api/srk/timeline/year/<year>/` | 📅 Timeline events by year                  |
-| GET    |`/api/srk/timeline/debut/`       | 📅 SRK’s debut event                        |
-| GET    |`/api/srk/votes/`                | ❤️ Fan votes for movies                     |
-| POST   |`/api/srk/vote/`                 | ❤️ Vote for a favorite movie                |
-| GET    |`/api/srk/quiz/`                 | ❓ Get a quiz question                       |
-| POST   |`/api/srk/quiz/validate/`        | ❓ Validate a quiz answer                    |
-| POST   |`/api/srk/fan-message/`          | ❤️ Submit a fan message                     |
+| Method | Endpoint                         | Description                                 |
+|--------|----------------------------------|---------------------------------------------|
+| GET    | `/api/srk/movies/tmdb/`          | 🎬 Raw Shah Rukh Khan movie data from TMDb  |
+| GET    | `/api/srk/movies/`               | 🎬 List all SRK movies in database          |
+| GET    | `/api/srk/movies/year/<year>/`   | 🎬 Movies by release year                   |
+| GET    | `/api/srk/movies/title/<title>/` | 🎬 Movie by title                           |
+| GET    | `/api/srk/movies/top-rated/`     | 🎬 Top-rated SRK movies                     |
+| GET    | `/api/srk/movies/genre/<genre>/` | 🎬 Movies by genre                          |
+| GET    | `/api/srk/songs/`                | 🎵 List all SRK movie songs                 |
+| GET    | `/api/srk/movies/<title>/songs/` | 🎵 Songs for a specific movie               |
+| GET    | `/api/srk/quotes/`               | 💬 List all SRK quotes                      |
+| GET    | `/api/srk/quotes/random/`        | 💬 Random SRK quote                         |
+| GET    | `/api/srk/quotes/movie/<title>/` | 💬 Quotes by movie title                    |
+| GET    | `/api/srk/quotes/tag/<tag>/`     | 💬 Quotes by tag (e.g., inspirational)      |
+| GET    | `/api/srk/awards/`               | 🏆 List all SRK awards                      |
+| GET    | `/api/srk/awards/year/<year>/`   | 🏆 Awards by year                           |
+| GET    | `/api/srk/awards/type/<type>/`   | 🏆 Awards by type (e.g., Filmfare)          |
+| GET    | `/api/srk/timeline/`             | 📅 SRK career milestones                    |
+| GET    | `/api/srk/timeline/year/<year>/` | 📅 Timeline events by year                  |
+| GET    | `/api/srk/timeline/debut/`       | 📅 SRK’s debut event                        |
+| GET    | `/api/srk/votes/`                | ❤️ Fan votes for movies                     |
+| POST   | `/api/srk/vote/`                 | ❤️ Vote for a favorite movie                |
+| GET    | `/api/srk/quiz/`                 | ❓ Get a quiz question                       |
+| POST   | `/api/srk/quiz/validate/`        | ❓ Validate a quiz answer                    |
+| POST   | `/api/srk/fan-message/`          | ❤️ Submit a fan message                     |
 
 ---
 
@@ -152,7 +156,7 @@ Populate the database with TMDb movies and sample data: <br>
 }
 
 **/api/srk/songs/** <br>
-{ <br>
+{<br>
   "title": "Tujh Mein Rab Dikhta Hai", <br>
   "movie": "Rab Ne Bana Di Jodi", <br>
   "audio_file": "/media/songs/tujh_mein_rab.mp3", <br>
@@ -165,47 +169,40 @@ Populate the database with TMDb movies and sample data: <br>
 
 ## 🛠️ Built With
 
-🐍 [Django](https://www.djangoproject.com/) – Python web framework
+🐍 [Django](https://www.djangoproject.com/)-Python web framework
 
-🔄 [Django REST Framework](https://www.django-rest-framework.org/) – API toolkit
+🔄 [Django REST Framework–](https://www.django-rest-framework.org/)-API toolkit
 
-📡 [requests](https://requests.readthedocs.io/) – HTTP library for TMDb API
+📡 [requests](https://requests.readthedocs.io/)-HTTP library for TMDb API
 
-🌐 [python-dotenv](https://pypi.org/project/python-dotenv/) – Environment variable management
+🌐 [python-dotenv–](https://pypi.org/project/python-dotenv/)-Environment variable management
 
-🗄️ [SQLite](https://www.sqlite.org/) – Default database ([PostgreSQL](https://www.postgresql.org/) recommended for production)
+🗄️ [SQLite](https://www.sqlite.org/)–Default database ([PostgreSQL](https://www.postgresql.org/) recommended for production)
 
 ---
 
 ## 🔧 Extending the Project
 
 **Custom Utilities 🛠️** :
-- Add functions in api/utils/helpers.py:
-   - api/utils/helpers.py <br>
-	  - def format_song_data(songs):
-	      - return [ <br>
-	        - {
-	           - "title": song.title,
-	           - "movie": song.movie.title,
-	           - "audio_url": song.audio_file.url if song.audio_file else "",
-	           -  "composer": song.composer,
-	           - "lyricist": song.lyricist,
-	           - "duration": song.duration
-	       -  }
-	       -  for song in songs
-	    ]
+1. Add functions in api/utils/helpers.py:
+      
 2. Import in api/views.py: <br>
 `from .utils.helpers import format_song_data`
+    
 3. Frontend 📱: <br>
-   1. Create templates with <audio> tags for song playback:
-	<audio controls>
-    <source src="{{ song.audio_file.url }}" type="audio/mpeg">
-	    Your browser does not support the audio element.
-	</audio>
+   - Create templates with `<audio>` tags for song playback: <br>
+	`<audio controls>`
+   <br>
+    `<source src="{{ song.audio_file.url }}" type="audio/mpeg">`
+	    <br> Your browser doesn’t support the audio element.
+	<br> `</audio>`
+   <br>
+   <br>
 4. External APIs 🌍: <br>
-Integrate Spotify/YouTube APIs for song metadata (requires API keys).
+   - Integrate Spotify/YouTube APIs for song metadata (requires API keys).
+
 5. Admin Interface 🖥️: <br>
-o	Upload song audio files (MP3/WAV) at http://localhost:8000/admin/api/song/.
+   - Upload song audio files (MP3/WAV) at http://localhost:8000/admin/api/song/.
 
 ---
 
@@ -214,22 +211,24 @@ o	Upload song audio files (MP3/WAV) at http://localhost:8000/admin/api/song/.
 - Data Sources 📊:
    - 🎬 Movies and song composers fetched from TMDb.
    - 💬 Quotes, 🏆 awards, 📅 timeline, and 🎵 song metadata from api/data/sample_data.py.
-   - 🎧 Song audio files uploaded via admin interface.
+   - 🎧 Song audio files uploaded via the administrator interface.
    - Database 🗄️: SQLite by default; use PostgreSQL for better JSONField support.
    - Deployment 🚀: Consider AWS S3 for song storage and Gunicorn/Daphne for production.
    - Contributing 🤝: Submit issues or merge requests at [GitLab](https://gitlab.com/RoyTrina/srkverse-a-shah-rukh-khan-information-api).
 
 ---
 
-##📌 License
-This project is licensed under the [MIT License](https://gitlab.com/RoyTrina/srkverse-a-shah-rukh-khan-information-api/-/blob/727b2a608ca7c3eaca1a24e1c63ba5377c707d7f/LICENSE). 🌟 <br>
+##📌 Licence
+This project is licensed under the [MIT Licence](https://gitlab.com/RoyTrina/srkverse-a-shah-rukh-khan-information-api/-/blob/727b2a608ca7c3eaca1a24e1c63ba5377c707d7f/LICENSE).
+🌟 <br>
 Data sourced from [The Movie Database (TMDb)](https://www.themoviedb.org/?language=en-GB) <br>
-This fan-made, educational project is **not affiliated with Shah Rukh Khan or any official entity**. <br>
+This fan-made, educational project is **not affiliated with Shah Rukh Khan or any official entity**.
+<br>
 
 ---
 
 ## 🙏 Acknowledgments
 Special thanks to the SRK fan community for inspiration! 🌟 <br>
-This is my version of a love letter to Shah Rukh Khan, the King of Bollywood and one of the greatest movie stars of all time! <br>
-👑 Made with ❤️ by a fan.. 
+This is my version of a love letter to Shah Rukh Khan, the King of Bollywood, and one of the greatest movie stars of all time! <br>
+👑 Made with ❤️ by a fan. 
 

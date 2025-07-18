@@ -1,3 +1,4 @@
+
 def format_tmdb_movie_data(movies):
     """Format TMDb movie data for cleaner output."""
     formatted = []
@@ -8,4 +9,4 @@ def format_tmdb_movie_data(movies):
             "role": movie.get("character", ""),
             "genres": movie.get("genres", [])
         })
-        return formatted
+    return formatted

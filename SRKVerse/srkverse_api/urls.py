@@ -3,7 +3,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
-path('api/', include('SRKVerse.api.urls'))
+path('api/', include('srkverse_api.urls'))
 
 from SRKVerse.api.views import (
     get_all_movies,
@@ -30,7 +30,7 @@ from SRKVerse.api.views import (
 
 urlpatterns = [
                   path('admin/', admin.site.urls),
-                  path('api/', include('SRKVerse.api.urls')),  # Include the api app's URLs
+                  path('api/', include('srkverse_api.urls')),  # Include the api app's URLs
 
                   # Movie Endpoints
                   path('srk/movies/', get_all_movies, name='movie-list'),
@@ -62,4 +62,3 @@ urlpatterns = [
                   path('srk/quiz/validate/', validate_quiz_view, name='validate-quiz'),
                   path('srk/fan-messages/', submit_message_view, name='submit-message'),
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-path('srk/movies/', get_all_movies, name='get_all_movies')

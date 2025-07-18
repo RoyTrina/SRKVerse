@@ -6,71 +6,11 @@ import random
 from .data.sample_data import SAMPLE_QUOTES, SAMPLE_AWARDS, SAMPLE_TIMELINE, SAMPLE_SONGS
 
 def load_movies():
-    """Load Shah Rukh Khan's movies from TMDb into the database."""
-    srk_id = 33488
-    url = f"https://api.themoviedb.org/3/person/{srk_id}/movie_credits"
-    params = {"api_key": settings.TMDB_API_KEY, "language": "en-US"}
-    try:
-        response = requests.get(url, params=params)
-        response.raise_for_status()
-        movies = response.json().get("cast", [])
-        genre_url = "https://api.themoviedb.org/3/genre/movie/list"
-        genre_response = requests.get(genre_url, params=params)
-        genre_response.raise_for_status()
-        genre_map = {genre['id']: genre['name'] for genre in genre_response.json().get('genres', [])}
-        
-        for movie in movies:
-            Movie.objects.update_or_create(
-                tmdb_id=movie.get("id"),
-                defaults={
-                    'title': movie.get("title", ""),
-                    'release_year': movie.get("release_date", "")[:4] or None,
-                    'overview': movie.get("overview", ""),
-                    'poster_path': movie.get("poster_path", ""),
-                    'rating': movie.get("vote_average", 0.0),
-                    'genres': [genre_map.get(gid, str(gid)) for gid in movie.get("genre_ids", [])],
-                    'character': movie.get("character", "")
-                }
-            )
-    except requests.RequestException as e:
-        print(f"Error loading movies: {e}")
-
-def load_quotes():
-    """Load quotes into the database from sample data."""
-    for q in SAMPLE_QUOTES:
-        movie = Movie.objects.filter(title=q["movie"]).first()
-        Quote.objects.update_or_create(
-            text=q["quote"],
-            defaults={
-                'movie': movie,
-                'year': q["year"],
-                'tags': q["tags"],
-                'context': q["context"]
-            }
-        )
 
 def load_awards():
-    """Load awards into the database from sample data."""
-    for a in SAMPLE_AWARDS:
-        movie = Movie.objects.filter(title=a["movie"]).first()
-        Award.objects.update_or_create(
-            title=a["title"],
-            year=a["year"],
-            defaults={
-                'type': a["type"],
-                'movie': movie,
-                'description': a["description"]
-            }
-        )
 
 def load_timeline():
-    """Load timeline events into the database from sample data."""
-    for t in SAMPLE_TIMELINE:
-        Timeline.objects.update_or_create(
-            year=t["year"],
-            event=t["event"],
-            defaults={'description': t["description"]}
-        )
+
 
 def load_songs():
     """Load songs into the database from sample data and attempt TMDb metadata."""

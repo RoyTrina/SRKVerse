@@ -162,6 +162,7 @@ def validate_quiz_view(request):
 
 @api_view(['POST'])
 def submit_message_view(request):
+    fan_message = submit_message()
     serializer = FanMessageSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
