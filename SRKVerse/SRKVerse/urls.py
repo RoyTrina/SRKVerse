@@ -3,7 +3,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
-from srk_api.views import (
+from SRKVerse.srk_api.views import (
     get_all_movies,
     get_movies_by_year_view,
     get_movie_by_title_view,
