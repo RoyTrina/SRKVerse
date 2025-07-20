@@ -17,9 +17,8 @@ class Movie(models.Model):
     def __str__(self):
         return self.tmdb_id, self.title, self.release_year, self.role, self.rating
 
-
-class Meta:
-    ordering = ['-release_year', 'title']
+    class Meta:
+        ordering = ['-release_year', 'title']
 
 
 class Quote(models.Model):
@@ -32,7 +31,7 @@ class Quote(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.text[:50] + '...' if len(self.text) > 50 else self.text
+        return "Quote is: " + self.text[:50] + '...' if len(self.text) > 50 else self.text
 
     class Meta:
         ordering = ['-created_at']

@@ -5,7 +5,7 @@ from .models import Movie, Quote, Award, Timeline, FanVote, FanMessage, Song
 class SRKVerseTests(TestCase):
     def setUp(self):
         # Create a test user and movie for all tests
-        self.user = User.objects.create_user(username="fan123", password="testpass")
+        self.user = User.objects.create_user(username="fan123", password="test_pass")
         self.movie = Movie.objects.create(
             tmdb_id=26022,
             title="My Name Is Khan",

@@ -14,7 +14,7 @@ DATA_DIR = BASE_DIR / "data"
 
 
 def load_movies():
-    """Load Shah Rukh KHan's movies from TMDb into the database.
+    """Load Shah Rukh Khan's movies from TMDb into the database.
     """
     srk_id = 33488
     url = f"https://api.themoviedb.org/3/person/{srk_id}/movie_credits"

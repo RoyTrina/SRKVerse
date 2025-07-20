@@ -52,7 +52,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'srkverse_api.urls'
+ROOT_URLCONF = 'SRKVerse.urls'
 
 TEMPLATES = [
     {
@@ -69,7 +69,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'srkverse_api.wsgi.application'
+WSGI_APPLICATION = 'SRKVerse.wsgi.application'
 
 
 # Database
@@ -129,4 +129,4 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 #TMDb API Key (store securely, e.g. in an environment variable)
-TMDB_API_KEY = 'YOUR_TMDB_API_KEY'
+TMDB_API_KEY = '8f3fae703d0f6036cab1126762915ebc'
