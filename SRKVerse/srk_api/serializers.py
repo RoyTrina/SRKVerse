@@ -5,7 +5,7 @@ from .models import Movie, Quote, Award, Timeline, FanVote, FanMessage, Song
 class MovieSerializer(serializers.ModelSerializer):
     class Meta:
         model = Movie
-        fields = ['id', 'tmdb_id', 'title', 'release_year', 'description', 'role', 'poster_path', 'rating', 'genre']
+        fields = '__all__'
 
 
 class QuoteSerializer(serializers.ModelSerializer):
@@ -13,7 +13,7 @@ class QuoteSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Quote
-        fields = ['id', 'text', 'movie', 'context', 'tags']
+        fields = '__all__'
 
 
 class AwardSerializer(serializers.ModelSerializer):

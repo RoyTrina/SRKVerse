@@ -3,7 +3,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
-from SRKVerse.api.views import (
+from srk_api.views import (
     get_all_movies,
     get_movies_by_year_view,
     get_movie_by_title_view,
@@ -28,10 +28,10 @@ from SRKVerse.api.views import (
 
 urlpatterns = [
                   path('admin/', admin.site.urls),
-                  path('api/', include('SRKVerse.urls')),  # Include the api app's URLs
+                  path('srk_api/', include('SRKVerse.urls')),  # Include the srk_api app's URLs
 
                   # Movie Endpoints
-                  path('srk/movies/', get_all_movies, name='movie-list'),
+                  path('srk_api/srk/movies/', get_all_movies, name='movie-list'),
                   path('srk/movies/<int:year>/', get_movies_by_year_view, name='movies-by-year'),
                   path('srk/movie/<str:title>/', get_movie_by_title_view, name='movie-by-title'),
                   path('srk/movies/top-rated/', get_top_rated_view, name='top-rated-movies'),

@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from SRKVerse.api.services import load_movies, load_awards, load_timeline, load_quotes
+from SRKVerse.srk_api.services import load_movies, load_awards, load_timeline, load_quotes
 
 
 class Command(BaseCommand):
