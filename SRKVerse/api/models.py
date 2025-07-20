@@ -3,12 +3,12 @@ from django.db import models
 
 class Movie(models.Model):
     objects = models.Manager()
-    tmdb_id = models.IntegerField(unique=True, null=True, blank=True)  # TMDb movie ID
+    tmdb_id = models.IntegerField(unique=True, null=True, blank=True)
     title = models.CharField(max_length=255)
     release_year = models.IntegerField(null=True, blank=True)
     description = models.TextField(blank=True)
     role = models.CharField(max_length=255, blank=True)
-    poster_path = models.CharField(max_length=255, blank=True)  # TMDb poster path
+    poster_path = models.CharField(max_length=255, blank=True)
     rating = models.CharField(null=True, blank=True)
     genre = models.JSONField(default=list, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -18,7 +18,7 @@ class Movie(models.Model):
         return self.title
 
     class Meta:
-        ordering = ['-release_year', 'title']  # Default ordering by release year and title
+        ordering = ['-release_year', 'title']
 
 
 class Quote(models.Model):
@@ -31,20 +31,19 @@ class Quote(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        # noinspection PyTypeChecker
         return self.text[:50] + '...' if len(self.text) > 50 else self.text
 
     class Meta:
-        ordering = ['-created_at']  # Default ordering by newest quotes
+        ordering = ['-created_at']
 
 
 class Award(models.Model):
     objects = models.Manager()
     title = models.CharField(max_length=200)
     year = models.IntegerField()
-    type = models.CharField(max_length=100)  # e.g Filmfare, National Award,
-    description = models.TextField(blank=True)
-    movie = models.ForeignKey('Movie', on_delete=models.CASCADE, null=True, blank=True)
+    type = models.CharField(max_length=100)
+    description = models.TextField(blank=True)  # Fixed
+    movie = models.ForeignKey('Movie', on_delete=models.CASCADE, null=True, blank=True)  # Fixed
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -79,7 +78,7 @@ class FanVote(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)  # Fixed
         self.vote_count = self.vote
 
     def __str__(self):
