@@ -15,7 +15,7 @@ class Movie(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.title
+        return self.tmdb_id, self.title, self.release_year, self.role, self.rating
 
     class Meta:
         ordering = ['-release_year', 'title']
