@@ -1,6 +1,5 @@
-# noinspection GrazieInspection
 """
-ASGI config for srkverse_api project.
+ASGI config for SRKVerse project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 

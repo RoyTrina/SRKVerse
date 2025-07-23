@@ -1,5 +1,5 @@
 """
-WSGI config for srkverse_api project.
+WSGI config for SRKVerse project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
