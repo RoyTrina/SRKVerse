@@ -2,11 +2,21 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+from pathlib import Path
 
 
 def main():
     """Run administrative tasks."""
-    sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+    #Get the absolute path of the current file's directory
+    current_path = Path(__file__).resolve().parent
+
+    #Add both the current directory and its parent to Python Path
+    sys.path.append(str(current_path))
+    sys.path.append(str(current_path.parent))
+
+    #Print paths for debugging
+    print("Current directory:", current_path)
+    print("Python path: ", sys.path)
 
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'SRKVerse.settings')
     try:
