@@ -1,6 +1,8 @@
-from django.test import TestCase
 from django.contrib.auth.models import User
+from django.test import TestCase
+
 from .models import Movie, Quote, Award, Timeline, FanVote, FanMessage, Song
+
 
 class SRKVerseTests(TestCase):
     def setUp(self):

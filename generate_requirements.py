@@ -1,13 +1,15 @@
 import ast
 import os
-import pkg_resources
 import sys
+
+import pkg_resources
 
 # Path to your source code
 PROJECT_DIR = "app"
 
 # Keywords to detect dev tools
 DEV_KEYWORDS = ["pytest", "black", "flake8", "mypy", "isort", "pre-commit", "coverage", "tox"]
+
 
 # Add known built-in Python modules to ignore
 def get_stdlib_modules():
@@ -18,6 +20,7 @@ def get_stdlib_modules():
             'os', 'sys', 'json', 're', 'math', 'time', 'random', 'datetime', 'pathlib',
             'typing', 'subprocess', 'logging', 'threading', 'http', 'urllib', 'email', 'itertools',
         }
+
 
 # Step 1: remove all import statements from the codebase
 def find_imports(directory):
@@ -40,6 +43,7 @@ def find_imports(directory):
                     print(f"⚠️ Skipping file with syntax error: {full_path}")
     return packages
 
+
 # Step 2: Classify used imports into runtime and dev requirements
 # noinspection PyShadowingNames
 def classify_packages(imports):
@@ -61,12 +65,14 @@ def classify_packages(imports):
                 run_time.add(versioned)
     return run_time, dev
 
+
 # Step 3: Write a requirements.txt file
 def write_requirements(packages, filename):
     with open(filename, "w") as f:
         for pkg in sorted(packages):
             f.write(pkg + "\n")
     print(f"📦 {filename} created ({len(packages)} packages).")
+
 
 if __name__ == "__main__":
     print("🔍 Scanning Python files in project...")

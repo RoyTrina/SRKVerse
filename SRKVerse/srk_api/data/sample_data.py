@@ -1,4 +1,5 @@
 # Sample data for quotes, awards, timeline, and songs
+# Link to the quotes (to be added in due time): https://www.filmfare.com/features/shah-rukh-khans-top-10-dialogues-16429-3.html
 
 SAMPLE_QUOTES = [
     {
@@ -14,6 +15,20 @@ SAMPLE_QUOTES = [
         "year": 2007,
         "tags": ["motivational"],
         "context": "Om's famous dialogue"
+    },
+    {
+        "quote": "Hum shareef kya hue puri duniya badmash hi ban gayi.",
+        "movie": "Dilwale",
+        "year": 2017,
+        "tags": ["teasing"],
+        "context": "For a funny moment"
+    },
+    {
+        "quote": "Kabhi kabhi jeetne ke liye kuch haarna padta hai.",
+        "movie": "Baazigar",
+        "year": 1993,
+        "tags": ["flirting"],
+        "context": "A moment between Ajay and Sonia."
     }
 ]
 

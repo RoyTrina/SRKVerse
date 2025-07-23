@@ -2,13 +2,9 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .models import Quote
-from .serializers import MovieSerializer, QuoteSerializer, AwardSerializer, TimelineSerializer, FanVoteSerializer, FanMessageSerializer
-from .services import (load_movies, get_random_quote, get_movie_by_title,
-                       get_movies_by_year, get_debut,
-                       get_top_rated, get_movies_by_genre, get_quotes_by_movie, get_quotes_by_tag, get_awards,
-                       get_awards_by_year, get_awards_by_type, get_events_by_year, get_timeline, get_votes,
-                       vote_favorite, get_quiz, validate_quiz, submit_message)
+from .serializers import MovieSerializer, QuoteSerializer, AwardSerializer, TimelineSerializer, FanVoteSerializer, \
+    FanMessageSerializer
+from .services import *
 
 
 @api_view(['GET'])

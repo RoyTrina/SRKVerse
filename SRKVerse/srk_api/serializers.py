@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from .models import Movie, Quote, Award, Timeline, FanVote, FanMessage, Song
 
 
@@ -10,7 +11,7 @@ class MovieSerializer(serializers.ModelSerializer):
 
 class QuoteSerializer(serializers.ModelSerializer):
     movie = serializers.SlugRelatedField(slug_field='title', read_only=True)
-    
+
     class Meta:
         model = Quote
         fields = '__all__'
@@ -18,7 +19,7 @@ class QuoteSerializer(serializers.ModelSerializer):
 
 class AwardSerializer(serializers.ModelSerializer):
     movie = serializers.SlugRelatedField(slug_field='title', read_only=True)
-    
+
     class Meta:
         model = Award
         fields = ['id', 'title', 'year', 'type', 'description', 'movie']
@@ -32,10 +33,11 @@ class TimelineSerializer(serializers.ModelSerializer):
 
 class FanVoteSerializer(serializers.ModelSerializer):
     movie = serializers.SlugRelatedField(slug_field='title', read_only=True)
-    
+
     class Meta:
         model = FanVote
         fields = ['id', 'movie', 'user', 'vote']
+
 
 class FanMessageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -45,7 +47,7 @@ class FanMessageSerializer(serializers.ModelSerializer):
 
 class SongSerializer(serializers.ModelSerializer):
     movie = serializers.SlugRelatedField(slug_field='title', read_only=True)
-    
+
     audio_file = serializers.FileField(required=False)
 
     class Meta:

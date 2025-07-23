@@ -1,8 +1,11 @@
+import logging
 import random
 from pathlib import Path
 
 import requests
+import requests.packages.urllib3.util.retry
 from django.conf import settings
+from requests.adapters import HTTPAdapter
 
 from .data.sample_data import SAMPLE_QUOTES, SAMPLE_AWARDS, SAMPLE_TIMELINE, SAMPLE_SONGS
 from .models import Movie, Quote, Award, Timeline, FanVote, Song
@@ -11,6 +14,21 @@ API_KEY = settings.TMDB_API_KEY
 BASE_URL = "https://api.themoviedb.org/3"
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
+
+logger = logging.getLogger(__name__)
+
+
+def create_session():
+    session = requests.Session()
+    retry = requests.packages.urllib3.util.retry.Retry(
+        total=3,
+        backoff_factor=0.5,
+        status_forcelist=[500, 502, 503, 504]
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    return session
 
 
 def load_movies():
@@ -42,7 +60,8 @@ def load_movies():
                 }
             )
     except requests.RequestException as e:
-        print(f"Error fetching TMDb movies: {e}")
+        logger.error(f"Error fetching TMDb movies: {e}")
+        raise
 
 
 def load_quotes():
@@ -114,13 +133,13 @@ def load_songs():
                 title=song["title"],
                 movie=movie,
                 defaults={
-                    'artist': song["artist", ""],
-                    'composer': song["composer", ""],
-                    'lyricist': song["lyricist", ""],
-                    'album': song["album", ""],
-                    'release_year': song["release_year", ""],
-                    'duration': song["duration", ""],
-                    'url': song["url", ""]
+                    'artist': song.get("artist", ""),
+                    'composer': song.get("composer", ""),
+                    'lyricist': song.get("lyricist", ""),
+                    'album': song.get("album", ""),
+                    'release_year': song.get("release_year", ""),
+                    'duration': song.get("duration", ""),
+                    'url': song.get("url", "")
                 }
             )
     movies = Movie.objects.all()
@@ -142,9 +161,6 @@ def get_genre_names():
     except requests.RequestException as e:
         print(f"Error fetching TMDb genre names: {e}")
         return {}
-
-    """Load movies from TMDb."""
-    return search_srk_movies()
 
 
 def get_random_quote():

@@ -71,7 +71,7 @@ class Timeline(models.Model):
 
 class FanVote(models.Model):
     objects = models.Manager()
-    movie = models.ForeignKey('Movie', on_delete=models.CASCADE)
+    Movie = models.ForeignKey('Movie', on_delete=models.CASCADE)
     user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     vote = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -82,7 +82,7 @@ class FanVote(models.Model):
         self.vote_count = self.vote
 
     def __str__(self):
-        return f"{self.movie.title} has {self.vote_count} votes"
+        return f"{self.Movie.name} has {self.vote_count} votes"
 
 
 class FanMessage(models.Model):
@@ -107,4 +107,4 @@ class Song(models.Model):
     duration = models.CharField(max_length=10, blank=True)
 
     def __str__(self):
-        return f"{self.title} ({self.movie.title})"
+        return f"{self.title} ({self.movie.name})"
