@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}SRKVerse{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <nav>
+        <a href="{% url 'index' %}">Home</a> |
+        <a href="{% url 'search' %}">Search</a> |
+        <a href="{% url 'api_docs' %}">API Docs</a>
+    </nav>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        <p>© 2025 SRKVerse | Contact: info@srkverse.com</p>
+    </footer>
+</body>
+</html>

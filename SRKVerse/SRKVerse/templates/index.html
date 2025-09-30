@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Home - SRKVerse{% endblock %}
+{% block content %}
+    <h1>Welcome to SRKVerse</h1>
+    <p>Explore the legendary career of Shah Rukh Khan!</p>
+    <form action="{% url 'search' %}" method="get">
+        <input type="text" name="q" placeholder="Search movies, bio, or trivia...">
+        <button type="submit">Search</button>
+    </form>
+    {% if featured_item %}
+        <h2>Featured: {{ featured_item.title }}</h2>
+        <p>{{ featured_item.description }}</p>
+    {% endif %}
+{% endblock %}
