@@ -36,7 +36,7 @@
            - name: Install dependencies
              run: |
                python -m pip install --upgrade pip
-               pip install -r requirements.txt
+               pip install -r SRKVerse/requirements.txt
            - name: Run migrations
              env:
                DB_NAME: srkverse
