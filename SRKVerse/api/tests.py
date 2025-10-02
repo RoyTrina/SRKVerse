@@ -6,12 +6,12 @@ from django.urls import reverse
 from .models import Movie, Song, Quote, Award, Timeline, FanVote, FanMessage
 from .serializers import SongUploadSerializer
 from rest_framework import status
-import json
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
+from django.core.exceptions import ValidationError
+import spotipy.exceptions
 
 class SRKVerseModelTests(TestCase):
     def setUp(self):
-        # Create a sample movie for testing
         self.movie = Movie.objects.create(
             tmdb_id=12345,
             title="Dilwale Dulhania Le Jayenge",
@@ -70,6 +70,76 @@ class SRKVerseModelTests(TestCase):
     def test_fan_message_str(self):
         message = FanMessage.objects.create(name="Fan", message="Love SRK!")
         self.assertEqual(str(message), "Fan: Love SRK!")
+
+class SpotifyIntegrationTests(TestCase):
+    def setUp(self):
+        self.movie = Movie.objects.create(
+            tmdb_id=12345, title="Dilwale Dulhania Le Jayenge", release_year=1995
+        )
+        self.song = Song.objects.create(
+            title="Tujhe Dekha To", movie=self.movie, composer="Jatin-Lalit"
+        )
+
+    @patch('api.services.get_spotify_client')
+    def test_enhance_song_with_spotify_mocked(self, mock_client):
+        mock_sp = MagicMock()
+        mock_track = {
+            'id': 'mock_spotify_id',
+            'preview_url': 'https://p.scdn.co/mp3-preview/mock.mp3',
+            'popularity': 85,
+            'duration_ms': 300000
+        }
+        mock_sp.search.return_value = {
+            'tracks': {'items': [mock_track]}
+        }
+        mock_client.return_value = mock_sp
+
+        from .services import enhance_song_with_spotify
+        enhance_song_with_spotify("Tujhe Dekha To", "Dilwale Dulhania Le Jayenge")
+
+        updated_song = Song.objects.get(id=self.song.id)
+        self.assertEqual(updated_song.spotify_id, 'mock_spotify_id')
+        self.assertEqual(updated_song.preview_url, 'https://p.scdn.co/mp3-preview/mock.mp3')
+        self.assertEqual(updated_song.popularity, 85)
+        self.assertEqual(updated_song.duration, 300)
+
+    @patch('api.services.get_spotify_client')
+    def test_enhance_song_spotify_rate_limit(self, mock_client):
+        mock_sp = MagicMock()
+        mock_sp.search.side_effect = spotipy.exceptions.SpotifyException(
+            429, message="API rate limit exceeded"
+        )
+        mock_client.return_value = mock_sp
+
+        from .services import enhance_song_with_spotify
+        with self.assertRaises(ValidationError) as cm:
+            enhance_song_with_spotify("Tujhe Dekha To", "Dilwale Dulhania Le Jayenge")
+        self.assertEqual(str(cm.exception), "Spotify rate limit exceeded. Please try again later.")
+
+    @patch('api.services.get_spotify_client')
+    def test_enhance_song_spotify_auth_failure(self, mock_client):
+        mock_client.side_effect = ValidationError("Spotify authentication failed: Invalid credentials")
+        from .services import enhance_song_with_spotify
+        with self.assertRaises(ValidationError) as cm:
+            enhance_song_with_spotify("Tujhe Dekha To", "Dilwale Dulhania Le Jayenge")
+        self.assertIn("Spotify authentication failed", str(cm.exception))
+
+    @patch.dict('django.conf.settings', {
+        'SPOTIFY_CLIENT_ID': 'test_id',
+        'SPOTIFY_CLIENT_SECRET': 'test_secret'
+    })
+    def test_enhance_song_with_spotify_real(self):
+        import os
+        if os.getenv('RUN_SPOTIFY_LIVE_TESTS', 'false') == 'true':
+            from .services import enhance_song_with_spotify
+            try:
+                enhance_song_with_spotify("Tujhe Dekha To", "Dilwale Dulhania Le Jayenge")
+                updated_song = Song.objects.get(id=self.song.id)
+                self.assertIsNotNone(updated_song.spotify_id)
+            except ValidationError as e:
+                self.fail(f"Live Spotify test failed: {str(e)}")
+        else:
+            self.skipTest("Skipping live Spotify test; set RUN_SPOTIFY_LIVE_TESTS=true")
 
 class SRKVerseAPITests(APITestCase):
     def setUp(self):
@@ -131,6 +201,7 @@ class SRKVerseAPITests(APITestCase):
     def test_get_movie_by_title_not_found(self):
         response = self.client.get(reverse('movie-by-title', args=['Nonexistent Movie']))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data['error'], "Movie not found")
 
     def test_get_all_songs(self):
         response = self.client.get(reverse('song-list'))
@@ -147,6 +218,7 @@ class SRKVerseAPITests(APITestCase):
     def test_get_movie_songs_not_found(self):
         response = self.client.get(reverse('movie-songs', args=['Nonexistent Movie']))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data['error'], "Movie not found")
 
     def test_upload_song_valid(self):
         with open('test_song.mp3', 'wb') as f:
@@ -159,10 +231,12 @@ class SRKVerseAPITests(APITestCase):
             'lyricist': 'Anand Bakshi',
             'audio_file': upload_file
         }
-        response = self.client.post(reverse('upload-song'), data, format='multipart')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data['message'], 'Song uploaded successfully')
-        self.assertEqual(Song.objects.count(), 2)
+        with patch('api.views.enhance_song_with_spotify') as mock_enhance:
+            response = self.client.post(reverse('upload-song'), data, format='multipart')
+            self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+            self.assertEqual(response.data['message'], 'Song uploaded successfully')
+            self.assertEqual(Song.objects.count(), 2)
+            mock_enhance.assert_called_once_with('Yeh Dil Deewana', 'Dilwale Dulhania Le Jayenge')
         os.remove('test_song.mp3')
 
     def test_upload_song_duplicate(self):
@@ -176,13 +250,52 @@ class SRKVerseAPITests(APITestCase):
         }
         response = self.client.post(reverse('upload-song'), data, format='multipart')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn('Song or album already available', str(response.data))
+        self.assertIn('Song or album already available', str(response.data['error']))
         os.remove('test_song.mp3')
 
-    def test_upload_song_missing_fields(self):
-        data = {'title': 'Yeh Dil Deewana'}  # Missing movie_title and audio_file
+    def test_upload_song_invalid_file_type(self):
+        with open('test.txt', 'wb') as f:
+            f.write(b"Invalid content")
+        upload_file = SimpleUploadedFile('test.txt', b"Invalid content", content_type='text/plain')
+        data = {
+            'title': 'Yeh Dil Deewana',
+            'movie_title': 'Dilwale Dulhania Le Jayenge',
+            'audio_file': upload_file
+        }
         response = self.client.post(reverse('upload-song'), data, format='multipart')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('Invalid file format', str(response.data['error']))
+        os.remove('test.txt')
+
+    def test_upload_song_too_large(self):
+        with open('test_song.mp3', 'wb') as f:
+            f.write(b"A" * (6 * 1024 * 1024))  # 6MB
+        upload_file = SimpleUploadedFile('test_song.mp3', b"A" * (6 * 1024 * 1024), content_type='audio/mpeg')
+        data = {
+            'title': 'Yeh Dil Deewana',
+            'movie_title': 'Dilwale Dulhania Le Jayenge',
+            'audio_file': upload_file
+        }
+        response = self.client.post(reverse('upload-song'), data, format='multipart')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('File size exceeds 5MB limit', str(response.data['error']))
+        os.remove('test_song.mp3')
+
+    def test_upload_song_spotify_failure(self):
+        with open('test_song.mp3', 'wb') as f:
+            f.write(b"Fake MP3 content")
+        upload_file = SimpleUploadedFile('test_song.mp3', b"Fake MP3 content", content_type='audio/mpeg')
+        data = {
+            'title': 'Yeh Dil Deewana',
+            'movie_title': 'Dilwale Dulhania Le Jayenge',
+            'audio_file': upload_file
+        }
+        with patch('api.views.enhance_song_with_spotify', side_effect=ValidationError("Spotify rate limit exceeded")):
+            response = self.client.post(reverse('upload-song'), data, format='multipart')
+            self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+            self.assertIn('Spotify metadata could not be fetched', response.data['message'])
+            self.assertEqual(Song.objects.count(), 2)
+        os.remove('test_song.mp3')
 
     def test_get_all_quotes(self):
         response = self.client.get(reverse('quote-list'))
